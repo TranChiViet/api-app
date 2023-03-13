@@ -39,15 +39,15 @@ class ProductLoaded extends ProductState {
   List<Object?> get props => [productList];
 }
 
-// class ProductUpdating extends ProductState {
-//   @override
-//   List<Object?> get props => [];
-// }
+class ProductUpdating extends ProductState {
+  @override
+  List<Object?> get props => [];
+}
 
-// class ProductUpdated extends ProductState {
-//   @override
-//   List<Object?> get props => [];
-// }
+class ProductUpdated extends ProductState {
+  @override
+  List<Object?> get props => [];
+}
 
 class ProductDeleting extends ProductState {
   @override

@@ -16,6 +16,62 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<ProductBloc>(context).add(GetData());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("API App"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _create(),
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.green,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: BlocBuilder<ProductBloc, ProductState>(
+        builder: (context, state) {
+          if (state is ProductLoaded) {
+            List<Product> productList = state.productList;
+
+            return ListView.builder(
+                itemCount: productList.length,
+                itemBuilder: (_, index) {
+                  Product product = productList[index];
+                  return Card(
+                    child: ListTile(
+                      leading: IconButton(
+                          onPressed: () {
+                            _edit(product);
+                          },
+                          icon: const Icon(Icons.edit)),
+                      title: Text(product.name),
+                      subtitle: Text(product.price.toString()),
+                      trailing: IconButton(
+                          onPressed: () {
+                            context.read<ProductBloc>().add(Delete(product));
+                          },
+                          icon: const Icon(Icons.delete)),
+                    ),
+                  );
+                });
+          } else if (state is ProductLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return Container();
+          }
+        },
+      ),
+    );
+  }
+
   Future<void> _create() async {
     await showModalBottomSheet(
       isScrollControlled: true,
@@ -48,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                 ElevatedButton(
                     onPressed: () async {
                       var product = Product(
-                        id: DateTime.now().toString(),
+                        // id: DateTime.now().toString(),
                         name: _nameController.text,
                         price: int.parse(_priceController.text),
                       );
@@ -66,51 +122,57 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    BlocProvider.of<ProductBloc>(context).add(GetData());
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("API App"),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _create(),
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.green,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: BlocBuilder<ProductBloc, ProductState>(
-        builder: (context, state) {
-
-          if (state is ProductLoaded) {
-
-            List<Product> productList = state.productList;
-
-            return ListView.builder(
-                itemCount: productList.length,
-                itemBuilder: (_, index) {
-                  Product product = productList[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(product.name),
-                      subtitle: Text(product.price.toString()),
-                      trailing: IconButton(onPressed: (){
-                        context.read<ProductBloc>().add(Delete(product));
-                      }, icon: Icon(Icons.delete)),
-                    ),
-                  );
-                });
-          } else if (state is ProductLoading){
-            return const Center(child: CircularProgressIndicator(),);
-          }else{
-            return Container();
-          }
-        },
-      ),
+  Future<void> _edit(Product product) async {
+    final TextEditingController _name =
+        TextEditingController(text: product.name);
+    final TextEditingController _price =
+        TextEditingController(text: product.price.toString());
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _name,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  autofocus: true,
+                ),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: _price,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                    onPressed: () async {
+                      var product = Product(
+                        // id: DateTime.now().toString(),
+                        name: _name.text,
+                        price: int.parse(_price.text),
+                      );
+                      if (product.price != null) {
+                        context.read<ProductBloc>().add(Update(product));
+                        _nameController.text = '';
+                        _priceController.text = '';
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('Edit'))
+              ]),
+        );
+      },
     );
   }
 }

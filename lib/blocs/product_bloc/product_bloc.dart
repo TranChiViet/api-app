@@ -13,7 +13,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<Create>(_onCreate);
     on<GetData>(_onGetData);
     on<Delete>(_onDelete);
-    // on<Update>(_onUpdate);
+    on<Update>(_onUpdate);
   }
 
   void _onCreate(Create event, Emitter emit) async {
@@ -38,16 +38,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  // void _onUpdate(Update event, Emitter emit) async {
-  //   emit(ProductUpdating());
-  //   await Future.delayed(const Duration(seconds: 1));
-  //   try {
-  //     await productRepository.update(event.product);
-  //     emit(ProductUpdated());
-  //   } catch (e) {
-  //     emit(ProductError(e.toString()));
-  //   }
-  // }
+  void _onUpdate(Update event, Emitter emit) async {
+    emit(ProductUpdating());
+    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await productRepository.update(event.product);
+      emit(ProductUpdated());
+    } catch (e) {
+      emit(ProductError(e.toString()));
+    }
+  }
 
   void _onDelete(Delete event, Emitter emit) async {
     emit(ProductDeleting());

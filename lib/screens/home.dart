@@ -29,9 +29,15 @@ class Home extends StatelessWidget {
             duration: Duration(seconds: 2),
           ));
         }
+        if (state is ProductUpdated) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Product updated"),
+            duration: Duration(seconds: 2),
+          ));
+        }
       }, child: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
-          if (state is ProductAdding || state is ProductDeleting) {
+          if (state is ProductAdding || state is ProductDeleting || state is ProductUpdating) {
             return const Center(
               child: CircularProgressIndicator(),
             );

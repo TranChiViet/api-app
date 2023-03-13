@@ -20,14 +20,14 @@ class GetData extends ProductEvent {
   GetData();
 }
 
-// class Update extends ProductEvent {
-//   final Product product;
-//   Update(
-//     this.product,
-//   );
-//   @override
-//   List<Object> get props => [product];
-// }
+class Update extends ProductEvent {
+  final Product product;
+  Update(
+    this.product,
+  );
+  @override
+  List<Object> get props => [product];
+}
 
 class Delete extends ProductEvent {
   final Product product;
